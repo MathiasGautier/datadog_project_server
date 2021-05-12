@@ -18,7 +18,7 @@ logRouter.post("/log", (req, res) => {
   axios
     .post(
       "https://http-intake.logs.datadoghq.com/v1/input/"+req.body.api,
-      req.body.textRes,
+      req.body.text,
       { headers: { "content-type": "application/json" } }
     )
     .then((res) => {
