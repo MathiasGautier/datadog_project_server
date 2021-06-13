@@ -10,19 +10,20 @@ const axios = require("axios");
 // console.log("yooo", process.env.API_KEY)
 
 logRouter.post("/log", (req, res) => {
-  console.log("text:", req.body.text);
-  console.log("api:", req.body.api)
   res.send(req.body);
 
+  let logToSend = JSON.parse(req.body.text);
+  logToSend.ddsource = "test_your_stuff";
 
   axios
     .post(
-      "https://http-intake.logs.datadoghq.com/v1/input/"+req.body.api,
-      req.body.text,
+      "https://http-intake.logs.datadoghq.com/v1/input/" + req.body.api,
+      logToSend,
       { headers: { "content-type": "application/json" } }
     )
     .then((res) => {
-      console.log("res:", res);
+      // console.log(req.body.text)
+      console.log("res:", res.status);
     })
     .catch((error) => {
       console.log(error);
