@@ -2,6 +2,8 @@ const express = require("express");
 const userRouter = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const axios = require("axios");
+const logger = require("../config/logger");
 
 const salt = 10;
 
@@ -11,17 +13,18 @@ userRouter.get("/getUser", (req, res) => {
 
 userRouter.post("/login", (req, res, next) => {
   const { username, password } = req.body;
-  console.log(req.body);
   User.findOne({
     username,
   }).then((userDocument) => {
     if (!userDocument) {
+      logger.log("info", "invalid credentials", {username:req.body.username});
       return res.status(400).json({
         message: "Invalid credentials",
       });
     }
     const isValidPassword = bcrypt.compareSync(password, userDocument.password);
     if (!isValidPassword) {
+      logger.log("info", "invalid password", {username:req.body.username});
       return res.status(400).json({
         message: "Invalid credentials",
       });
@@ -29,7 +32,7 @@ userRouter.post("/login", (req, res, next) => {
     const userObj = userDocument.toObject();
     delete userObj.password;
     req.session.currentUser = userObj;
-
+    logger.log("info", "Sucessfully logged in", {username:req.body.username});
     res.status(200).json(userObj);
   });
 });
@@ -61,6 +64,7 @@ userRouter.post("/register", (req, res, next) => {
       const userObj = newUserDocument.toObject();
       delete userObj.password;
       req.session.currentUser = userObj;
+      logger.log("info", "New account created", {username:req.body.username});
       res.status(201).json(userObj);
     });
   });
@@ -105,5 +109,38 @@ userRouter.get("/users", (req, res) => {
     });
 });
 
+userRouter.post("/api", (req, res) => {
+  axios
+    .get("https://api.datadoghq.com/api/v1/validate", {
+      headers: {
+        "content-type": "application/json",
+        "DD-API-KEY": req.body.apiKey,
+      },
+    })
+    .then((success) => {
+      logger.log("info", "API key validated");
+      console.log("res", success.statusText);
+      res.send(success.statusText);
+    })
+    .catch((error) => {
+      console.log("error", error.response.data.status);
+      logger.log("info", "API key not valid");
+      res.send(error.response.data.status);
+    });
+});
+
+userRouter.put("/apiKey/:id", (req, res) => {
+  User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  })
+    .then((document) => {
+      res.status(200).json(document);
+      logger.log("info", "API key updated");
+    })
+    .catch((error) => {
+      res.status(500).json(error);
+      logger.log("info", "couldn't update API key");
+    });
+});
 
 module.exports = userRouter;
