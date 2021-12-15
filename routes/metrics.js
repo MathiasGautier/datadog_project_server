@@ -6,6 +6,7 @@ const logger = require("../config/logger");
 metricRouter.post("/post_metrics", (req, res) => {
 
   if (req.body.metricObject.checkRepeat === false) {
+    console.log(req.body.metricObject.tagList)
     axios
       .post(
         "https://api.datadoghq.com/api/v1/series/",
@@ -21,7 +22,7 @@ metricRouter.post("/post_metrics", (req, res) => {
                   Number(req.body.metricObject.metricValue),
                 ],
               ],
-              // tags: req.body.metricObject.tagList
+              tags: req.body.metricObject.tagList
             },
           ],
         },
@@ -33,12 +34,8 @@ metricRouter.post("/post_metrics", (req, res) => {
         }
       )
       .then((document) => {
-        console.log(document);
-        logger.log("info", "Sent metric", document);
-        // res.send(
-        //   // document.data.status,
-        //   JSON.stringify(document.config.data)
-        // );
+        console.log(document.config);
+        logger.log("info", "Sent metric", req.body.metricObject.username);
         res.send(
           JSON.stringify(document.config.data, null, "\t")
         )
@@ -65,9 +62,10 @@ metricRouter.post("/post_metrics", (req, res) => {
                   Number(
                     Date.now().toString().split("").splice(0, 10).join("")
                   ),
-                  req.body.metricObject.value,
+                  Number(req.body.metricObject.metricValue),
                 ],
               ],
+              tags: req.body.metricObject.tagList
             },
           ],
         },
@@ -80,7 +78,7 @@ metricRouter.post("/post_metrics", (req, res) => {
       )
       .then((document) => {
         console.log(document);
-        logger.log("info", "Sent metric", document);
+        logger.log("info", "Sent metric", req.body.metricObject.username);
         // res.status(200).json(document);
         res.send(JSON.stringify(document.config.data, null, "\t"))
 

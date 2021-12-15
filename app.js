@@ -1,7 +1,7 @@
 const tracer = require("dd-trace").init({
   logInjection : true,
   //debug:true,
-  env: "local_macbook_test",
+  env: "local_macbook_math",
   service:"test_your_stuff"
 })
 

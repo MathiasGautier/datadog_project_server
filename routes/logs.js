@@ -28,6 +28,39 @@ logRouter.post("/log", (req, res) => {
     });
 });
 
+logRouter.post("/post_event", (req, res) => {
+  console.log(req.body.eventObject)
+  axios
+    .post(
+      "https://api.datadoghq.com/api/v1/events",
+      {
+        title: req.body.eventObject.eventTitle,
+        text: req.body.eventObject.eventText,
+        tags: req.body.eventObject.tagList
+      },
+      {
+        headers: {
+          "content-type": "text/json",
+          "DD-API-KEY": req.body.eventObject.apiKey,
+        },
+      }
+    )
+    .then((document) => {
+      console.log(document.config);
+      logger.log("info", "Sent event", req.body.eventObject.username);
+      res.send(
+        JSON.stringify(document.config.data, null, "\t")
+      )
+
+      res.status(200);
+    })
+    .catch((error) => {
+      logger.log("info", "Fail to send event", error);
+      console.log(error);
+      res.status(500).json(error);
+    });
+})
+
 
 
 
