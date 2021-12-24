@@ -62,7 +62,7 @@ metricRouter.post("/post_metrics", (req, res) => {
                   Number(
                     Date.now().toString().split("").splice(0, 10).join("")
                   ),
-                  Number(req.body.metricObject.metricValue),
+                  Number(req.body.metricObject.value),
                 ],
               ],
               tags: req.body.metricObject.tagList

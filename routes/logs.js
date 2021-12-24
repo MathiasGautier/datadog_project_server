@@ -47,7 +47,7 @@ logRouter.post("/post_event", (req, res) => {
     )
     .then((document) => {
       console.log(document.config);
-      logger.log("info", "Sent event", req.body.eventObject.username);
+      logger.log("info", "Sent event", {username: req.body.eventObject.username});
       res.send(
         JSON.stringify(document.config.data, null, "\t")
       )
