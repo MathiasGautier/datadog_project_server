@@ -35,7 +35,7 @@ metricRouter.post("/post_metrics", (req, res) => {
       )
       .then((document) => {
         console.log(document.config);
-        logger.log("info", "Sent metric", req.body.metricObject.username);
+        logger.log("info", "Sent metric", {username:req.body.metricObject.username});
         res.send(
           JSON.stringify(document.config.data, null, "\t")
         )
@@ -78,7 +78,7 @@ metricRouter.post("/post_metrics", (req, res) => {
       )
       .then((document) => {
         console.log(document);
-        logger.log("info", "Sent metric", req.body.metricObject.username);
+        logger.log("info", "Sent metric", {username:req.body.metricObject.username});
         // res.status(200).json(document);
         res.send(JSON.stringify(document.config.data, null, "\t"))
 
