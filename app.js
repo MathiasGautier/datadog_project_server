@@ -65,6 +65,9 @@ app.use("/logs", logRouter);
 app.use("/user", userRouter);
 app.use("/metrics", metricRouter);
 
+app.get('/*', (req, res) => {
+  res.sendFile(__dirname + '/build/index.html');
+})
 // Error handler middleware
 // If you pass an argument to your next function in any of your routes or middlewares
 // You will end up in this middleware
@@ -76,6 +79,5 @@ app.use((err, req, res, next) => {
   }
 });
 
-console.log(process.env)
 
 module.exports = app;
