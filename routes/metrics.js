@@ -5,6 +5,10 @@ const logger = require("../config/logger");
 
 metricRouter.post("/post_metrics", (req, res) => {
 
+  // console.log("laaaaaaa--------",req.body.metricObject.metricTimestamp===true)
+
+  req.body.metricObject.metricTimestamp ? console.log("TRUE") : console.log("FALSE")
+
   if (req.body.metricObject.checkRepeat === false) {
     console.log(req.body.metricObject.tagList)
     axios
@@ -16,9 +20,10 @@ metricRouter.post("/post_metrics", (req, res) => {
               metric: req.body.metricObject.metricName,
               points: [
                 [
-                  Number(
-                    Date.now().toString().split("").splice(0, 10).join("")
-                  ),
+                  req.body.metricObject.metricTimestamp ? Number(req.body.metricObject.metricTimestamp) :
+                    Number(
+                      Date.now().toString().split("").splice(0, 10).join("")
+                    ),
                   Number(req.body.metricObject.metricValue),
                 ],
               ],
@@ -35,7 +40,7 @@ metricRouter.post("/post_metrics", (req, res) => {
       )
       .then((document) => {
         console.log(document.config);
-        logger.log("info", "Sent metric", {username:req.body.metricObject.username});
+        logger.log("info", "Sent metric", { username: req.body.metricObject.username });
         res.send(
           JSON.stringify(document.config.data, null, "\t")
         )
@@ -78,7 +83,7 @@ metricRouter.post("/post_metrics", (req, res) => {
       )
       .then((document) => {
         console.log(document);
-        logger.log("info", "Sent metric", {username:req.body.metricObject.username});
+        logger.log("info", "Sent metric", { username: req.body.metricObject.username });
         // res.status(200).json(document);
         res.send(JSON.stringify(document.config.data, null, "\t"))
 
