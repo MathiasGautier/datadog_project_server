@@ -12,7 +12,6 @@ logRouter.post("/log", (req, res) => {
         headers: {
           "content-type": "application/json",
           "DD-API-KEY": req.body.api,
-          ddsource: "teest",
         },
       }
     )
@@ -47,7 +46,7 @@ logRouter.post("/post_event", (req, res) => {
     )
     .then((document) => {
       console.log(document.config);
-      logger.log("info", "Sent event", {username: req.body.eventObject.username});
+      logger.log("info", "Sent event", { username: req.body.eventObject.username });
       res.send(
         JSON.stringify(document.config.data, null, "\t")
       )
@@ -55,59 +54,36 @@ logRouter.post("/post_event", (req, res) => {
       res.status(200);
     })
     .catch((error) => {
-      logger.log("info", "Fail to send event", error);
+      logger.log("info", "Failed to send event", error);
+      console.log(error);
+      res.status(500).json(error);
+    });
+})
+
+logRouter.post("/post_simple_log", (req, res) => {
+  axios
+    .post(
+      "https://http-intake.logs.datadoghq.com/v1/input?ddsource=test-your-stuff",
+      req.body.logObject.text,
+      { headers: { "content-type": "text/plain", "DD-API-KEY": req.body.logObject.api } }
+    )
+    .then((document) => {
+      console.log(document);
+      logger.log("info", "Sent simple text log", { username: req.body.logObject.username });
+      res.send(
+        ("hello", document.status)
+      )
+
+      res.status(200);
+    })
+    .catch((error) => {
+      logger.log("info", "Failed to send simple text log", error);
       console.log(error);
       res.status(500).json(error);
     });
 })
 
 
-
-
-// axios
-//   .post(
-//     "https://api.datadoghq.com/api/v2/logs/events/search",
-//     {
-//       filter: {
-//         query: "@ticket:558247",
-//       },
-//     },
-//     {
-//       headers: {
-//         "Content-type": "application/json",
-//         "DD-API-KEY": process.env.API_KEY,
-//         "DD-APPLICATION-KEY": process.env.APP_KEY,
-//       },
-//     }
-//   )
-//   .then((success) => {
-//     console.log(success.data.data.map((x) => x.attributes));
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
-
-
-// let test=()=>{
-//   axios
-//   .post(
-//     "https://http-intake.logs.datadoghq.com/v1/input/" + process.env.API_KEY,
-//     {"hello":"world"},
-//     { headers: { "content-type": "application/json", ddsource: "teest" } }
-//   )
-//   .then((success) => {
-//     console.log(success);
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
-// }
-
-// test()
-
-// setInterval(function(){
-//   test()
-// }, 500)
 
 
 
